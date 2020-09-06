@@ -1,0 +1,18 @@
+[package]
+name = "proxy"
+version = "0.1.0"
+authors = ["Tim Wilson <twilson@palantir.com>"]
+edition = "2018"
+
+[[bin]]
+name = "bootstrap"
+path = "src/main.rs"
+
+[dependencies]
+lambda_runtime = "*"
+ureq = { version = "*", default-features = false, features = ["tls"] }
+serde = { version = "*", features = ["derive"] }
+
+[profile.release]
+opt-level = 3
+lto = true
