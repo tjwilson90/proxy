@@ -656,6 +656,7 @@ dependencies = [
 name = "proxy"
 version = "0.1.0"
 dependencies = [
+ "base64",
  "lambda_runtime",
  "serde",
  "ureq",

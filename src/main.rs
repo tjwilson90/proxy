@@ -8,16 +8,15 @@ use std::io::Read;
 struct Request {
     path: String,
     method: Option<String>,
-    headers: Option<Vec<(String, String)>>,
+    #[serde(default)]
+    headers: Vec<(String, String)>,
     body: Option<Vec<u8>>,
 }
 
-fn handler(r: Request, _: Context) -> Result<Vec<u8>, HandlerError> {
+fn handler(r: Request, _: Context) -> Result<String, HandlerError> {
     let mut req = ureq::request(r.method.as_deref().unwrap_or("GET"), &r.path);
-    if let Some(headers) = &r.headers {
-        for (h, v) in headers {
-            req.set(h, v);
-        }
+    for (h, v) in &r.headers {
+        req.set(h, v);
     }
     let resp = match r.body.as_deref() {
         Some(body) => req.send_bytes(body),
@@ -28,7 +27,7 @@ fn handler(r: Request, _: Context) -> Result<Vec<u8>, HandlerError> {
         None => Vec::new(),
     };
     match resp.into_reader().read_to_end(&mut buf) {
-        Ok(_) => Ok(buf),
+        Ok(_) => Ok(base64::encode(buf)),
         Err(e) => Err(HandlerError::from(e.to_string().as_ref())),
     }
 }
